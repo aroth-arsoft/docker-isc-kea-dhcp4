@@ -19,7 +19,7 @@ push:: ## Pushes the docker image to the registry
 		@docker push $(FULL_IMAGE_TAG)
 
 build:: ## Builds the docker image locally
-	curl -1sLf "https://dl.cloudsmith.io/public/isc/kea-2-0/gpg.8029D4AFA58CBB5E.key" | gpg --dearmor > isc-kea.gpg
+	#curl -1sLf "https://dl.cloudsmith.io/public/isc/kea-2-0/gpg.8029D4AFA58CBB5E.key" | gpg --dearmor > isc-kea.gpg
 	curl -1sLf "https://dl.cloudsmith.io/public/isc/stork/gpg.77F64EC28053D1FB.key" | gpg --dearmor > isc-stork.gpg
 	@docker build -f Dockerfile -t $(IMAGE_TAG_VER) $(WORKING_DIR)
 	@docker tag $(IMAGE_TAG_VER) $(IMAGE_TAG)

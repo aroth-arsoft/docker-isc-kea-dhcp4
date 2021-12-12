@@ -44,6 +44,18 @@ cat << EOF > /tmp/kea-common.json
         "user": "${KEA_DATABASE_USER_NAME}",
         "password": "${KEA_DATABASE_PASSWORD}"
     },
+    "hooks-libraries": [
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_lease_cmds.so"
+        },
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_stat_cmds.so"
+        },
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_mysql_cb.so"
+        }
+    ],
+
 
 EOF
 
