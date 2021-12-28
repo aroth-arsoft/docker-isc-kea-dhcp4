@@ -1,10 +1,17 @@
 DOCKER_REGISTRY ?= hub.docker.com
-IMAGE_NAME := $(shell basename `pwd` )
+#IMAGE_NAME := $(shell basename `pwd` )
+IMAGE_NAME ?= docker-isc-kea
 IMAGE_VERSION = latest
 BUILD_NUMBER ?= unstable
-IMAGE_TAG_VER = $(IMAGE_NAME):$(BUILD_NUMBER)
-IMAGE_TAG = $(IMAGE_NAME):$(IMAGE_VERSION)
-FULL_IMAGE_TAG = $(DOCKER_REGISTRY)/$(IMAGE_TAG)
+DHCP4_IMAGE_NAME = $(IMAGE_NAME)-dhcp4
+DHCP4_IMAGE_TAG_BUILD = $(DHCP4_IMAGE_NAME):$(BUILD_NUMBER)
+DHCP4_IMAGE_TAG_VER = $(DHCP4_IMAGE_NAME):$(IMAGE_VERSION)
+DHCP4_IMAGE_TAG_REMOTE = $(DOCKER_REGISTRY)/$(DHCP4_IMAGE_TAG_VER)
+DHCP6_IMAGE_NAME = $(IMAGE_NAME)-dhcp6
+DHCP6_IMAGE_TAG_BUILD = $(DHCP6_IMAGE_NAME):$(BUILD_NUMBER)
+DHCP6_IMAGE_TAG_VER = $(DHCP6_IMAGE_NAME):$(IMAGE_VERSION)
+DHCP6_IMAGE_TAG_REMOTE = $(DOCKER_REGISTRY)/$(DHCP6_IMAGE_TAG_VER)
+
 
 WORKING_DIR := $(shell pwd)
 
@@ -16,14 +23,18 @@ WORKING_DIR := $(shell pwd)
 release:: build push ## Builds and pushes the docker image to the registry
 
 push:: ## Pushes the docker image to the registry
-		@docker push $(FULL_IMAGE_TAG)
+	@docker push $(FULL_IMAGE_TAG)
 
 build:: ## Builds the docker image locally
 	#curl -1sLf "https://dl.cloudsmith.io/public/isc/kea-2-0/gpg.8029D4AFA58CBB5E.key" | gpg --dearmor > isc-kea.gpg
 	curl -1sLf "https://dl.cloudsmith.io/public/isc/stork/gpg.77F64EC28053D1FB.key" | gpg --dearmor > isc-stork.gpg
-	@docker build -f Dockerfile -t $(IMAGE_TAG_VER) $(WORKING_DIR)
-	@docker tag $(IMAGE_TAG_VER) $(IMAGE_TAG)
-	@docker tag $(IMAGE_TAG_VER) $(FULL_IMAGE_TAG)
+	@docker build -f Dockerfile --target isc-kea-dhcp4-server -t $(DHCP4_IMAGE_TAG_BUILD) $(WORKING_DIR)
+	@docker tag $(DHCP4_IMAGE_TAG_BUILD) $(DHCP4_IMAGE_TAG_VER)
+	@docker tag $(DHCP4_IMAGE_TAG_BUILD) $(DHCP4_IMAGE_TAG_REMOTE)
+
+	@docker build -f Dockerfile --target isc-kea-dhcp6-server -t $(DHCP6_IMAGE_TAG_BUILD) $(WORKING_DIR)
+	@docker tag $(DHCP6_IMAGE_TAG_BUILD) $(DHCP6_IMAGE_TAG_VER)
+	@docker tag $(DHCP6_IMAGE_TAG_BUILD) $(DHCP6_IMAGE_TAG_REMOTE)
 
 image: release
 		@docker image save $(IMAGE_TAG_VER) | xz --threads=2 -z > $(WORKING_DIR)/$(IMAGE_NAME)_$(BUILD_NUMBER).tar.xz

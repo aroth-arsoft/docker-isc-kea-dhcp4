@@ -138,10 +138,10 @@ COPY --from=builder /usr/share/man/man8/kea-shell.8 /usr/share/man/man8
 COPY --from=builder /usr/share/man/man8/kea-ctrl-agent.8 /usr/share/man/man8
 
 # Copy configuration files.
-COPY supervisor-agent-kea.conf /etc/supervisor.conf
+COPY supervisor-agent-dhcp4.conf /etc/supervisor.conf
 COPY kea-dhcp4.conf /etc/kea/
 COPY agent-kea-ctrl-agent.conf /etc/kea-agent/kea-ctrl-agent.conf
-COPY *.sh /agent/
+COPY entrypoint-dhcp4.sh /agent/
 
 ENV KEA_DATABASE_DELAY=10 \
     KEA_DATABASE_TYPE=mysql \
@@ -153,27 +153,52 @@ ENV KEA_DATABASE_DELAY=10 \
     KEA_DATABASE_PASSWORD=kea
 
 # Initialize the backends and start the supervisor.
-ENTRYPOINT ["bash", "/agent/entrypoint.sh" ]
-#
-# FROM debian:10-slim as isc-kea-dhcp6-server
-# LABEL maintainer="serhiy.makarenko@me.com"
-#
-# ARG DEBIAN_FRONTEND=noninteractive
-#
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends --no-install-suggests \
-#     liblog4cplus-1.1-9 libssl1.1 libboost-system1.67.0 libmariadb3 libpq5 && \
-#     rm -rf /var/lib/apt/lists/*
-#
-# RUN mkdir /var/run/kea && mkdir /var/lib/kea && mkdir /etc/kea
-#
-# COPY --from=builder /usr/lib/isc-kea-common-libs /usr/lib/
-# COPY --from=builder /usr/lib/kea/hooks/isc-kea-common-hooks /usr/lib/kea/hooks
-# COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
-# COPY --from=builder /usr/sbin/kea-dhcp6 /usr/sbin
-# COPY --from=builder /etc/kea/kea-dhcp6.conf /etc/kea
-# COPY --from=builder /usr/share/man/man8/kea-lfc.8 /usr/share/man/man8
-# COPY --from=builder /usr/share/man/man8/kea-dhcp6.8 /usr/share/man/man8
-#
-# ENTRYPOINT ["/usr/sbin/kea-dhcp6"]
-# CMD ["-c", "/etc/kea/kea-dhcp6.conf"]
+ENTRYPOINT ["bash", "/agent/entrypoint-dhcp4.sh" ]
+
+FROM debian:10-slim as isc-kea-dhcp6-server
+LABEL maintainer="serhiy.makarenko@me.com"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG DEBIAN_FRONTEND=noninteractive
+ADD *.gpg /etc/apt/trusted.gpg.d/
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y ca-certificates apt-transport-https \
+        supervisor prometheus-node-exporter net-tools iputils-ping mariadb-client \
+        liblog4cplus-1.1-9 libssl1.1 libboost-system1.67.0 libmariadb3 libpq5 && \
+    echo "deb [arch=amd64] https://dl.cloudsmith.io/public/isc/stork/deb/debian buster main" >> /etc/apt/sources.list.d/isc-stork.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends --no-install-suggests isc-stork-agent && \
+    rm -rf /usr/share/doc/* /usr/share/man/* /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    mkdir /var/run/kea && mkdir /var/lib/kea && mkdir /etc/kea
+
+COPY --from=builder /usr/lib/isc-kea-common-libs /usr/lib/
+COPY --from=builder /usr/lib/kea/hooks/isc-kea-common-hooks /usr/lib/kea/hooks
+COPY --from=builder /usr/sbin/kea-admin /usr/sbin
+COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
+COPY --from=builder /usr/sbin/kea-dhcp6 /usr/sbin
+COPY --from=builder /usr/sbin/kea-ctrl-agent /usr/sbin
+COPY --from=builder /etc/kea/kea-dhcp6.conf /etc/kea
+COPY --from=builder /usr/share/man/man8/kea-lfc.8 /usr/share/man/man8
+COPY --from=builder /usr/share/man/man8/kea-dhcp6.8 /usr/share/man/man8
+COPY --from=builder /usr/share/man/man8/kea-lfc.8 /usr/share/man/man8
+COPY --from=builder /usr/share/man/man8/kea-shell.8 /usr/share/man/man8
+COPY --from=builder /usr/share/man/man8/kea-ctrl-agent.8 /usr/share/man/man8
+
+# Copy configuration files.
+COPY supervisor-agent-dhcp6.conf /etc/supervisor.conf
+COPY kea-dhcp6.conf /etc/kea/
+COPY agent-kea-ctrl-agent.conf /etc/kea-agent/kea-ctrl-agent.conf
+COPY entrypoint-dhcp6.sh /agent/
+
+ENV KEA_DATABASE_DELAY=10 \
+    KEA_DATABASE_TYPE=mysql \
+    KEA_DATABASE_HOST=mysql \
+    KEA_DATABASE_PORT=3306 \
+    KEA_DATABASE_NAME=kea \
+    KEA_DATABASE_USER_NAME=kea \
+    KEA_DATABASE_SSLMODE= \
+    KEA_DATABASE_PASSWORD=kea
+
+# Initialize the backends and start the supervisor.
+ENTRYPOINT ["bash", "/agent/entrypoint-dhcp6.sh" ]
