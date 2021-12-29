@@ -8,7 +8,7 @@ else
     kea_database_type_full="${KEA_DATABASE_TYPE}"
 fi
 
-cat << EOF > /tmp/kea-common.json
+cat << EOF > /tmp/kea-common6.json
     "loggers": [
         {
             "name": "kea-dhcp6",

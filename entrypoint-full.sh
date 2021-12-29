@@ -71,6 +71,71 @@ cat << EOF > /tmp/kea-common4.json
           "library": "/usr/lib/kea/hooks/libdhcp_mysql_cb.so"
         }
     ],
+EOF
+
+cat << EOF > /tmp/kea-common6.json
+    "loggers": [
+        {
+            "name": "kea-dhcp6",
+            "output_options": [
+                {
+                    "output": "stdout",
+                    "pattern": "%-5p %m\n"
+                },
+                {
+                    "output": "/tmp/kea-dhcp6.log"
+                }
+            ],
+            "severity": "DEBUG",
+            "debuglevel": 0
+        }
+    ],
+    "control-socket": {
+        "socket-type": "unix",
+        "socket-name": "/tmp/kea6-ctrl-socket"
+    },
+    "config-control": {
+        "config-databases": [{
+            "type": "${kea_database_type_full}",
+            "name": "${KEA_DATABASE_NAME}",
+            "user": "${KEA_DATABASE_USER_NAME}",
+            "password": "${KEA_DATABASE_PASSWORD}",
+            "host": "${KEA_DATABASE_HOST}",
+            "port": ${KEA_DATABASE_PORT}
+        }],
+        "config-fetch-wait-time": 20
+    },
+    "hosts-database": {
+        "type": "${kea_database_type_full}",
+        "name": "${KEA_DATABASE_NAME}",
+        "user": "${KEA_DATABASE_USER_NAME}",
+        "password": "${KEA_DATABASE_PASSWORD}",
+        "host": "${KEA_DATABASE_HOST}",
+        "port": ${KEA_DATABASE_PORT}
+    },
+    "lease-database": {
+        "type": "${kea_database_type_full}",
+        "host": "${KEA_DATABASE_HOST}",
+        "port": ${KEA_DATABASE_PORT},
+        "name": "${KEA_DATABASE_NAME}",
+        "user": "${KEA_DATABASE_USER_NAME}",
+        "password": "${KEA_DATABASE_PASSWORD}"
+    },
+    "hooks-libraries": [
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_lease_cmds.so"
+        },
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_stat_cmds.so"
+        },
+        # Premium hooks: https://github.com/isc-projects/kea/blob/master/doc/sphinx/arm/hooks.rst
+#        {
+#          "library": "/usr/lib/kea/hooks/libdhcp_host_cmds.so"
+#        },
+        {
+          "library": "/usr/lib/kea/hooks/libdhcp_mysql_cb.so"
+        }
+    ],
 
 
 EOF
