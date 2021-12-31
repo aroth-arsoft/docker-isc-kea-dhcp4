@@ -44,6 +44,7 @@ RUN cd kea-${KEA_VERSION} && \
         --disable-static \
         --disable-rpath \
         --enable-generate-parser \
+        --enable-perfdhcp \
         --disable-dependency-tracking \
         --without-werror && \
     make -j3 && \
@@ -224,6 +225,7 @@ COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
 COPY --from=builder /usr/sbin/kea-ctrl-agent /usr/sbin
 COPY --from=builder /usr/sbin/kea-dhcp6 /usr/sbin
 COPY --from=builder /usr/sbin/kea-dhcp4 /usr/sbin
+COPY --from=builder /usr/sbin/perfdhcp /usr/sbin
 COPY --from=builder /etc/kea/kea-dhcp4.conf /etc/kea
 COPY --from=builder /etc/kea/kea-dhcp6.conf /etc/kea
 COPY --from=builder /usr/share/man/man8/kea-dhcp4.8 /usr/share/man/man8
