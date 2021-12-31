@@ -1,4 +1,4 @@
-DOCKER_REGISTRY ?= hub.docker.com
+DOCKER_REGISTRY ?= rothan
 #IMAGE_NAME := $(shell basename `pwd` )
 IMAGE_NAME ?= docker-isc-kea
 IMAGE_VERSION = latest
@@ -28,7 +28,9 @@ WORKING_DIR := $(shell pwd)
 release:: build push ## Builds and pushes the docker image to the registry
 
 push:: ## Pushes the docker image to the registry
-	@docker push $(FULL_IMAGE_TAG)
+	#@docker push $(DHCP4_IMAGE_TAG_REMOTE)
+	#@docker push $(DHCP6_IMAGE_TAG_REMOTE)
+	@docker push $(FULL_IMAGE_TAG_REMOTE)
 
 
 isc-stork.gpg:
