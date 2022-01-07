@@ -127,6 +127,7 @@ RUN apt-get update && \
 COPY --from=builder /usr/lib/isc-kea-common-libs /usr/lib/
 COPY --from=builder /usr/lib/kea/hooks/isc-kea-common-hooks /usr/lib/kea/hooks
 COPY --from=builder /usr/sbin/kea-admin /usr/sbin
+COPY --from=builder /usr/sbin/kea-shell /usr/sbin
 COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
 COPY --from=builder /usr/sbin/kea-dhcp4 /usr/sbin
 COPY --from=builder /usr/sbin/kea-ctrl-agent /usr/sbin
@@ -174,6 +175,7 @@ RUN apt-get update && \
 COPY --from=builder /usr/lib/isc-kea-common-libs /usr/lib/
 COPY --from=builder /usr/lib/kea/hooks/isc-kea-common-hooks /usr/lib/kea/hooks
 COPY --from=builder /usr/sbin/kea-admin /usr/sbin
+COPY --from=builder /usr/sbin/kea-shell /usr/sbin
 COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
 COPY --from=builder /usr/sbin/kea-dhcp6 /usr/sbin
 COPY --from=builder /usr/sbin/kea-ctrl-agent /usr/sbin
@@ -210,7 +212,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ADD *.gpg /etc/apt/trusted.gpg.d/
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y ca-certificates apt-transport-https \
-        supervisor prometheus-node-exporter net-tools iputils-ping mariadb-client \
+        supervisor prometheus-node-exporter net-tools iputils-ping mariadb-client python3 \
         liblog4cplus-1.1-9 libssl1.1 libboost-system1.67.0 libmariadb3 libpq5 && \
     echo "deb [arch=amd64] https://dl.cloudsmith.io/public/isc/stork/deb/debian buster main" >> /etc/apt/sources.list.d/isc-stork.list && \
     apt-get update && \
@@ -221,6 +223,7 @@ RUN apt-get update && \
 COPY --from=builder /usr/lib/isc-kea-common-libs /usr/lib/
 COPY --from=builder /usr/lib/kea/hooks/isc-kea-common-hooks /usr/lib/kea/hooks
 COPY --from=builder /usr/sbin/kea-admin /usr/sbin
+COPY --from=builder /usr/sbin/kea-shell /usr/sbin
 COPY --from=builder /usr/sbin/kea-lfc /usr/sbin
 COPY --from=builder /usr/sbin/kea-ctrl-agent /usr/sbin
 COPY --from=builder /usr/sbin/kea-dhcp6 /usr/sbin
@@ -236,6 +239,7 @@ COPY --from=builder /usr/share/man/man8/kea-ctrl-agent.8 /usr/share/man/man8
 COPY --from=builder /usr/sbin/kea-dhcp-ddns /usr/sbin
 COPY --from=builder /etc/kea/kea-dhcp-ddns.conf /etc/kea
 COPY --from=builder /usr/share/man/man8/kea-dhcp-ddns.8 /usr/share/man/man8
+COPY --from=builder /usr/lib/python3.7/site-packages/kea/ /usr/lib/python3.7/site-packages/kea/
 
 # Copy configuration files.
 COPY supervisor-agent-full.conf /etc/supervisor.conf
