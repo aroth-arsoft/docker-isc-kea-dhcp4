@@ -67,6 +67,11 @@ cat << EOF > /tmp/kea-common4.json
 #        {
 #          "library": "/usr/lib/kea/hooks/libdhcp_host_cmds.so"
 #        },
+        # https://gitlab.isc.org/isc-projects/kea/-/blob/master/doc/sphinx/arm/hooks-cb-cmds.rst
+        # The cb_cmds library is only available to ISC customers with a paid support contract.
+#        {
+#          "library": "/usr/lib/kea/hooks/libdhcp_cb_cmds.so"
+#        },
         {
           "library": "/usr/lib/kea/hooks/libdhcp_mysql_cb.so"
         }
